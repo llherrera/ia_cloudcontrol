@@ -1,5 +1,5 @@
-var xlsx = require("xlsx");
-const fs = require('fs')
+import xlsx from "xlsx";
+import fs from 'fs';
 // const { Configuration, OpenAIApi } = require("openai");
 
 // const configuration = new Configuration({

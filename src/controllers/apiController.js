@@ -1,6 +1,6 @@
-const fileService = require("../services/file/fileService");
-const fineTuneService = require("../services/file/fineTuneServices");
-const openaiService = require("../services/file/openAIService");
+import fileService from "../services/file/fileService";
+import fineTuneService from "../services/file/fineTuneServices";
+import openaiService from "../services/file/openAIService";
 
 async function Test(req, res) {
     res.send("test ok");
