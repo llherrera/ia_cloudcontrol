@@ -1,5 +1,6 @@
 import xlsx from "xlsx";
 import fs from 'fs';
+import OpenAI from 'openai';
 // const { Configuration, OpenAIApi } = require("openai");
 
 // const configuration = new Configuration({
@@ -11,7 +12,6 @@ import fs from 'fs';
 // const openai = new OpenAIApi(configuration);
 
 
-const OpenAI = require('openai');
 const openai = new OpenAI({
     apiKey: "..."
 });
@@ -75,7 +75,7 @@ async function DeleteFile(fileId) {
 }
 
 
-module.exports = {
+export {
     TransformData,
     UploadFile,
     ListFiles,

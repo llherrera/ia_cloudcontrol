@@ -69,7 +69,7 @@ async function DeleteModelFineTune(model) {
 }
 
 
-module.exports = {
+export {
     CreateFineTune,
     ListFineTune,
     RetrieveFineTune,

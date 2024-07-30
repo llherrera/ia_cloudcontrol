@@ -24,6 +24,6 @@ async function GetMessage(message) {
     }
 }
 
-module.exports = {
+export {
     GetMessage
 }
