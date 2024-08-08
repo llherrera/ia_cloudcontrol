@@ -1,1 +1,5 @@
-export * from './route';
+import { ApiRouter } from './route.js';
+
+export {
+    ApiRouter
+};

@@ -1,6 +1,6 @@
-import * as fileService from "../services/file/fileService";
-import * as fineTuneService from "../services/file/fineTuneServices";
-import * as openaiService from "../services/file/openAIService";
+import * as fileService from "../services/file/fileService.js";
+import * as fineTuneService from "../services/file/fineTuneServices.js";
+import * as openaiService from "../services/file/openAIService.js";
 
 export async function Test(req, res) {
     res.send("test ok");
@@ -83,4 +83,28 @@ export async function GetMessage(req, res) {
     var message = req.query["message"];
     const response = await openaiService.GetMessage(message);
     res.send(response);
+}
+
+export async function DoQuestionToQuery(req, res) {
+    const { message } = req.query;
+    try {
+        const response = await openaiService.DoQuestionToQuery(message);
+        if (!response.includes('Lo siento')) {
+            return res.status(200).send(response);
+        }
+        res.status(400).send('Lo siento, ocurrió un problema, inténtalo más tarde.');
+    } catch (error) {
+        res.status(500).send('Lo siento, ocurrió un problema, inténtalo más tarde.')
+    }
+}
+
+export async function DoRowsToResponse(req, res) {
+    const { data, message } = req.query;
+    try {
+        const response = await openaiService.BuildResponse(data, message);
+        return res.status(200).send(response);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err.message);
+    }
 }

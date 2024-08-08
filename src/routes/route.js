@@ -1,5 +1,5 @@
 import express from "express";
-import * as apiController from "../controllers/apiController";
+import * as apiController from "../controllers/index.js";
 const router = express.Router();
 
 router
@@ -15,5 +15,7 @@ router
 .post("/cancel-fine-tune", apiController.CancelFineTune)
 .delete("/delete-model-fine-tune", apiController.DeleteModelFineTune)
 .get("/get-message", apiController.GetMessage)
+.get("/do-query", apiController.DoQuestionToQuery)
+.get("/do-response", apiController.DoRowsToResponse)
 
 export { router as ApiRouter };
