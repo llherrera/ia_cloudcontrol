@@ -86,15 +86,17 @@ export async function GetMessage(req, res) {
 }
 
 export async function DoQuestionToQuery(req, res) {
-    const { message } = req.query;
+    const { messages } = req.query;
+    if (!Array.isArray(messages) && messages.length === 0 ) return res.status(400).send('El arreglo de mensajes no puede estar vacio')
     try {
-        const response = await openaiService.DoQuestionToQuery(message);
+        let msgs = messages.map((m, i) => ({"role": i%2 ? "user" : "assistant", "content": m}));
+        const response = await openaiService.DoQuestionToQuery(msgs);
         if (!response.includes('Lo siento')) {
             return res.status(200).send(response);
         }
-        res.status(400).send('Lo siento, ocurrió un problema, inténtalo más tarde.');
+        return res.status(400).send('Lo siento, ocurrió un problema, inténtalo más tarde.');
     } catch (error) {
-        res.status(500).send('Lo siento, ocurrió un problema, inténtalo más tarde.')
+        return res.status(500).send('Lo siento, ocurrió un problema, inténtalo más tarde.')
     }
 }
 
