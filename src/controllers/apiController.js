@@ -84,7 +84,7 @@ export async function GetMessage(req, res) {
     const response = await openaiService.GetMessage(message);
     res.send(response);
 }
-
+ 
 export async function DoQuestionToQuery(req, res) {
     const { messages } = req.query;
     if (!Array.isArray(messages) && messages.length === 0 ) return res.status(400).send('El arreglo de mensajes no puede estar vacio')
