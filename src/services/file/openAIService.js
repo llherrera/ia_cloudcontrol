@@ -156,7 +156,8 @@ async function DoQuestionToQuery(messages) {
         Cuando se habla de ejecuciones se refiere a la tabla 'Unit_node' y 'Unit_node_year'.
         Ten en cuenta que cuando hablamos de secretarias, para la tabla Unit_node nos referimos a los responsables de los nodos unitarios o Unit_node (metas). Por lo tanto, la relación de tablas es a través de la columna responsable de la tabla Unit_node y no de la columna id_plan, la tabla Secretaries tiene la columna Name que coincide con la columna Responsible de Unit_node. La relación también se puede hacer utilizando el nombre en la tabla secretarias y el responsable.
         Para la tabla de evidencias, la columna 'Unidad' hace referencia a la unidad de medida. Cuando se quiera acceder a las ejecuciones de las evidencias la columna 'Amount' es la ejecución física y columna 'executed_resources' a la ejecución financiera.
-        Cuando se quiere información de las ejecuciones en las localidades se busca en la tabla de evidencias en las columnas 'commune' o 'neighborhood'
+        Cuando se quiere información de las ejecuciones en las localidades se busca en la tabla de evidencias en las columnas 'commune' o 'neighborhood'.
+        IMPORTANTE: Para realizar respuestas mas completas, cuando se trate de metas regresa la información de los nodos seleccionados. Si se trata de evidencias regresa la información de las evidencias seleccionadas. Si se trata de ejecuciones, ten encuenta que las ejecuciones están asociadas a un nodo o meta de producto.
     `;
     try {
         const response = await openai.chat.completions.create({
