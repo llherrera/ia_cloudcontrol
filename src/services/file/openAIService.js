@@ -152,9 +152,8 @@ async function DoQuestionToQuery(messages) {
     const system_info = `Algunas relaciones de las tablas y columnas de la base de datos.
         No usar la sentencia LIMIT, sql server no lo usa. Solo usar TOP para seleccionar una cantidad de filas.
         Si se está buscando mínimos, solo se permitiran valores superiores a 0.
-        Recuerda cuando se habla de mayor ejecución se debe hacer la operación de porcentaje (physical_execution / physical_programming) de ejecución.
         Recuerda que para las 'Metas', o Unit_node, los valores de las ejecuciones se encuentran en la tabla Unit_node_year.
-        Cuando se habla de ejecuciones se refiere a la tabla 'Unit_node' y 'Unit_node_year'.
+        Cuando se habla de ejecuciones se refiere a la tabla 'Unit_node' y 'Unit_node_year'. Recuerda cuando se habla de mayor ejecución se debe hacer la operación de porcentaje (physical_execution / physical_programming) de ejecución y NO se multiplica por 100.
         Ten en cuenta que cuando hablamos de secretarias, para la tabla Unit_node nos referimos a los responsables de los nodos unitarios o Unit_node (metas). Por lo tanto, la relación de tablas es a través de la columna responsable de la tabla Unit_node y no de la columna id_plan, la tabla Secretaries tiene la columna Name que coincide con la columna Responsible de Unit_node. La relación también se puede hacer utilizando el nombre en la tabla secretarias y el responsable.
         Para la tabla de evidencias, la columna 'Unidad' hace referencia a la unidad de medida. Cuando se quiera acceder a las ejecuciones de las evidencias la columna 'Amount' es la ejecución física y columna 'executed_resources' a la ejecución financiera.
         Cuando se quiere información de las ejecuciones en las localidades se busca en la tabla de evidencias en las columnas 'commune' o 'neighborhood'.
@@ -191,7 +190,8 @@ async function BuildResponse(data, msg) {
         Dada la pregunta de un usuario y la respuesta de las filas SQL de la base de datos de la que el usuario desea obtener la respuesta,
         escriba una respuesta en un objeto JSON con 2 propiedades: HTML y OPTIONS.
         En la propiedad HTML se da respuesta a la pregunta del usuario utilizando etiquetas de contenido HTML. Si la respuesta incluye gráficos, se añade una etiqueta div con el id='chart-replace', sino no.
-        En la propiedad OPTIONS si la respuesta incluye gráficos, se escribe JSON las opciones de configuración del gráfico para HighchartsReact. De lo contrario el valor es 'NULL'
+        En la propiedad OPTIONS si la respuesta incluye gráficos, se escribe JSON las opciones de configuración del gráfico para HighchartsReact. De lo contrario el valor es 'NULL'.
+        Recuerda que para las veces que se pida un grafico de porcentajes, usa los valores de los porcentajes.
         <user_question>{{
             ${msg}
         }}</user_question>
