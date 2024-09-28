@@ -151,7 +151,7 @@ async function DoQuestionToQuery(messages) {
     `;
     const system_info = `Algunas relaciones de las tablas y columnas de la base de datos.
         No usar la sentencia LIMIT, sql server no lo usa. Solo usar TOP para seleccionar una cantidad de filas.
-        Si se está buscando mínimos, solo se permitiran valores superiores a 0.
+        Si se pide valores mínimos, condicionar los valores a mayores que 0, porque los valores 0 se desprecian.
         Recuerda que para las 'Metas', o Unit_node, los valores de las ejecuciones se encuentran en la tabla Unit_node_year.
         Cuando se habla de ejecuciones se refiere a la tabla 'Unit_node' y 'Unit_node_year'. Recuerda cuando se habla de mayor ejecución se debe hacer la operación de porcentaje (physical_execution / physical_programming) de ejecución y NO se multiplica por 100.
         Ten en cuenta que cuando hablamos de secretarias, para la tabla Unit_node nos referimos a los responsables de los nodos unitarios o Unit_node (metas). Por lo tanto, la relación de tablas es a través de la columna responsable de la tabla Unit_node y no de la columna id_plan, la tabla Secretaries tiene la columna Name que coincide con la columna Responsible de Unit_node. La relación también se puede hacer utilizando el nombre en la tabla secretarias y el responsable.
