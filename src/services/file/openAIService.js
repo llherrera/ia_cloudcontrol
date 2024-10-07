@@ -5,6 +5,67 @@ const openai = new OpenAI({
     apiKey: process.env.API_KEY_OPENAI
 });
 
+const chatExamples = [
+    {
+        "role": "system", 
+        "content": "Cloud-i es un chat corporativo para generar informes."
+    }, {
+        "role": "user", 
+        "content": "Seleccionar las 5 ejecuciones físicas con mayor valor ejecutado en el año 2024. Para el plan con id: 6031. Si te menciono meta o metas productos tienes que traer la información de dicha meta y mostrar obligatoriamente el código de la meta, tambien devuelve el responsablie del nodo unidad."
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar las 5 ejecuciones físicas con mayor valor ejecutado en el año 2024', 'sql_query': 'SELECT TOP 5 UN.code, UN.responsible, UNY.physical_execution FROM Unit_node UN JOIN Unit_node_year UNY ON UN.code = UNY.code WHERE UNY.year = '2024' AND UNY.physical_programming > 0 AND UN.id_plan = 6031 ORDER BY (UNY.physical_execution / UNY.physical_programming) DESC;'"
+    }, {
+        "role": "user", 
+        "content": "Seleccionar la mayor ejecución financiera entre todos los años.para el plan con id: 6031.Si te menciono meta o metas productos tienes que traer la información de dicha meta y mostrar obligatoriamente el código de la meta, tambien devuelve el responsablie del nodo unidad."
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Seleccionar la mayor ejecución financiera entre todos los años', 'sql_query': 'SELECT TOP 1 UN.id_node, UN.description, UN.responsible, UNY.financial_execution FROM Unit_node UN JOIN Unit_node_year UNY ON UN.code = UNY.code WHERE UNY.year = (SELECT MAX(year) FROM Unit_node_year) AND UN.id_plan = 6031 ORDER BY UNY.financial_execution DESC;'"
+    }, {
+        "role": "user", 
+        "content": "Seleccionar la secretaría que tenga menos ejecutado financieramente en el año 2025. Para el plan con id: 6031. Si te menciono meta o metas productos tienes que traer la información de dicha meta y mostrar obligatoriamente el código de la meta, tambien devuelve el responsablie del nodo unidad."
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Seleccionar la secretaría que tenga menos ejecutado financieramente en el año 2025', 'sql_query': 'SELECT TOP 1 s.name AS SecretaryName, un.code AS UnitNodeCode, un.responsible AS ResponsibleName, un.goal, (UNY.financial_execution / NULLIF(UNY.physical_programming, 0)) AS ExecutionPercentage FROM Unit_node un INNER JOIN Unit_node_year UNY ON un.code = UNY.code INNER JOIN Secretaries s ON s.name = un.responsible WHERE UNY.year = '2025' AND un.id_plan = 6031 ORDER BY UNY.financial_execution ASC;'"
+    }, {
+        "role": "user", 
+        "content": "Mostrar la evidencia al máximo de con ejecución financiera. para el plan con id: 6031. Si te menciono meta o metas productos tienes que traer la información de dicha meta y mostrar obligatoriamente el código de la meta, tambien devuelve el responsablie del nodo unidad."
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Seleccionar la secretaría que tenga menos ejecutado financieramente en el año 2025', 'sql_query': 'SELECT TOP 1 e.*, un.code AS unit_node_code, un.responsible AS unit_node_responsible FROM Evidences e INNER JOIN Unit_node un ON e.id_plan = un.id_plan WHERE e.executed_resources > 0 AND e.amount > 0 AND e.id_plan = 6031 ORDER BY e.executed_resources DESC;' "
+    }, {
+        "role": "user", 
+        "content": "Seleccionar la localidad al mínimo de con ejecución física para el plan con id: 6031."
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Seleccionar la localidad al mínimo de con ejecución física para el plan con id: 6031.', 'sql_query': ' SELECT TOP 1 el.neighborhood, el.amount, el.executed_resources, un.code AS unit_code, un.responsible  FROM Evidences AS el  JOIN Unit_node AS un ON el.activitiesDesc = un.description  WHERE el.amount > 0 AND el.id_plan = 6031  ORDER BY el.amount DESC;' "
+    }, {
+        "role": "user", 
+        "content": "Obtener los niveles, y nombres de estos, a los que pertenece la meta con id 9827.1.2.1.3.1"
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Obtener los niveles, y nombres de estos, a los que pertenece la meta con id 9827.1.2.1.3.1', 'sql_query': 'SELECT n.name AS nodo, l.name AS nivel FROM Nodes AS n JOIN Levels AS l ON l.id_level = n.id_level WHERE @id_node LIKE n.id_node+'%';'"
+    }, {
+        "role": "user", 
+        "content": "Obtener las evidencias para la meta con código C.1.1.1.1.1.1 para el plan 6031"
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Obtener las evidencias para la meta con código C.1.1.1.1.1.1 para el plan 6031', 'sql_query': 'SELECT * FROM Evidences WHERE code = 'C.1.1.1.1.1.1' AND id_plan = 6031' "
+    }, {
+        "role": "user", 
+        "content": "Obtener la ejecución física y programación de la meta 9284.1.1.1.1.4 para el año 2024"
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Obtener la ejecución física y programación de la meta 9284.1.1.1.1.4 para el año 2024', 'sql_query': ' SELECT Unit_node_year.physical_programming, Unit_node_year.physical_execution FROM Unit_node_year JOIN ( SELECT id_node, code FROM Unit_node WHERE id_node = '9284.1.1.1.1.4' ) as NodeCode ON NodeCode.id_node = Unit_node_year.id_node and '2024-01-01' = Unit_node_year.year'"
+    }, {
+        "role": "user", 
+        "content": "Obtener las metas, y a donde pertenecen estas, de la secretaría de educación donde sea responsable. para el plan 6031"
+    }, {
+        "role": "assistant", 
+        "content": "'original_query': 'Obtener las metas, y a donde pertenecen estas, de la secretaría de educación donde sea responsable. para el plan 6031', 'sql_query': 'SELECT nod.name, nod.id_node, nod.parent FROM ( SELECT un.responsible, un.id_node, nod.name, nod.parent FROM dbo.Nodes as nod JOIN dbo.Unit_node as un ON un.id_node = nod.id_node WHERE un.responsible = 'Secretaría de Educación' AND un.id_plan = 6031 ) AS res JOIN dbo.Nodes AS nod ON res.id_node LIKE nod.id_node+'.%' GROUP BY nod.name, nod.id_node, nod.parent UNION SELECT nod.name, un.id_node, nod.parent FROM dbo.Nodes AS nod JOIN dbo.Unit_node AS un ON un.id_node = nod.id_node WHERE un.responsible = 'Secretaría de Educación' AND un.id_plan = 6031 ORDER BY id_node'"
+    }
+]
+
 async function GetMessage(message) {
     try {
         console.log(message);
@@ -135,6 +196,7 @@ async function DoQuestionToQuery(messages) {
         - modified_execution (bigint)
         - modified_date (date)
         - id_user (int)
+        - id_node (nvarchar(255))
     Table: Users
         - id_user (int)
         - name (nvarchar(255))
@@ -145,28 +207,29 @@ async function DoQuestionToQuery(messages) {
         - rol (nvarchar(255))
         - id_plan (int)
     Table: Weights
-        - id_node (nvarchar(255))
-        - weight (float)'}
+    - id_node (nvarchar(255))
+    - weight (float)'}
     </schema>
     `;
-    const system_info = `Algunas relaciones de las tablas y columnas de la base de datos.
-        No usar la sentencia LIMIT, sql server no lo usa. Solo usar TOP para seleccionar una cantidad de filas.
+    const system_info = `Algunas relaciones de las tablas y columnas de la base de datos. 
+        No usar la sentencia LIMIT, sql server no lo usa. Solo usar TOP para seleccionar una cantidad de filas. 
         Si se pide valores mínimos, condicionar los valores a mayores que 0, porque los valores 0 se desprecian.
-        Recuerda que para las 'Metas', o Unit_node, los valores de las ejecuciones se encuentran en la tabla Unit_node_year.
-        Cuando se habla de ejecuciones se refiere a la tabla 'Unit_node' y 'Unit_node_year'. Recuerda cuando se habla de mayor ejecución se debe hacer la operación de porcentaje (physical_execution / physical_programming) de ejecución y NO se multiplica por 100.
-        Ten en cuenta que cuando hablamos de secretarias, para la tabla Unit_node nos referimos a los responsables de los nodos unitarios o Unit_node (metas). Por lo tanto, la relación de tablas es a través de la columna responsable de la tabla Unit_node y no de la columna id_plan, la tabla Secretaries tiene la columna Name que coincide con la columna Responsible de Unit_node. La relación también se puede hacer utilizando el nombre en la tabla secretarias y el responsable.
-        Para la tabla de evidencias, la columna 'Unidad' hace referencia a la unidad de medida. Cuando se quiera acceder a las ejecuciones de las evidencias la columna 'Amount' es la ejecución física y columna 'executed_resources' a la ejecución financiera.
-        Cuando se quiere información de las ejecuciones en las localidades se busca en la tabla de evidencias en las columnas 'commune' o 'neighborhood'.
-        IMPORTANTE: Para realizar respuestas mas completas, cuando se trate de metas regresa la información de los nodos seleccionados. Si se trata de evidencias regresa la información de las evidencias seleccionadas. Si se trata de ejecuciones, ten encuenta que las ejecuciones están asociadas a un nodo o meta de producto.
+        Metas de producto = Nodo Unidad (Unit_node), ejecuciones de metas = Unit_node_year. Recuerda cuando se habla de mayor ejecución se debe hacer la operación de porcentaje (physical_execution / physical_programming) de ejecución y NO se multiplica por 100.
+        Secretaría = Responsable de Nodo unidad. 
+        Ten en cuenta que cuando hablamos de secretarias, para la tabla Unit_node nos referimos a los responsables de las Unit_node (metas). Por lo tanto, la relación de tablas es a través de la columna responsable de la tabla Unit_node y no de la columna id_plan, la tabla Secretaries tiene la columna Name que coincide con la columna Responsible de Unit_node. La relación también se puede hacer utilizando el nombre en la tabla secretarias y el responsable.
+        Para la tabla de evidencias, la columna 'Unidad' hace referencia a la unidad de medida. 
+        Cuando se quiera acceder a las ejecuciones de las evidencias la columna 'Amount' es la ejecución física y columna 'executed_resources' a la ejecución financiera. Cuando se quiere información de las ejecuciones en las localidades se busca en la tabla de evidencias en las columnas 'commune' o 'neighborhood'.
+        IMPORTANTE: Para realizar respuestas mas completas, cuando se trate de metas (Unit_node) regresa la información de los nodos seleccionados. Si se trata de evidencias (evidences) regresa la información de las evidencias seleccionadas. Si se trata de ejecuciones (Unit_node_year), ten encuenta que las ejecuciones están asociadas a un nodo o meta de producto.
     `;
     try {
         const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: 'gpt-4o-mini',
             response_format: {"type": "json_object"},
             messages: [
                 {"role": "system", "content": system_message},
                 {"role": "system", "content": system_info},
-                ...messages
+                ...chatExamples,
+                ...messages,
             ],
             temperature: 1,
             top_p: 1,
@@ -174,7 +237,6 @@ async function DoQuestionToQuery(messages) {
             presence_penalty: 0,
             stop: "END"
         });
-        //console.log(63, response.choices[0].message.content);
         if (response.choices.length > 0)
             return response.choices[0].message.content;
 
