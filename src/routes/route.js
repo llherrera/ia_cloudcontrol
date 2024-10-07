@@ -15,7 +15,7 @@ router
 .post("/cancel-fine-tune", apiController.CancelFineTune)
 .delete("/delete-model-fine-tune", apiController.DeleteModelFineTune)
 .get("/get-message", apiController.GetMessage)
-.get("/do-query", apiController.DoQuestionToQuery)
-.get("/do-response", apiController.DoRowsToResponse)
+.post("/do-query", apiController.DoQuestionToQuery)
+.post("/do-response", apiController.DoRowsToResponse)
 
 export { router as ApiRouter };

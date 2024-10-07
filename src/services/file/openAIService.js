@@ -32,7 +32,7 @@ const chatExamples = [
         "content": "Mostrar la evidencia al máximo de con ejecución financiera. para el plan con id: 6031. Si te menciono meta o metas productos tienes que traer la información de dicha meta y mostrar obligatoriamente el código de la meta, tambien devuelve el responsablie del nodo unidad."
     }, {
         "role": "assistant", 
-        "content": "'original_query': 'Seleccionar la secretaría que tenga menos ejecutado financieramente en el año 2025', 'sql_query': 'SELECT TOP 1 e.*, un.code AS unit_node_code, un.responsible AS unit_node_responsible FROM Evidences e INNER JOIN Unit_node un ON e.id_plan = un.id_plan WHERE e.executed_resources > 0 AND e.amount > 0 AND e.id_plan = 6031 ORDER BY e.executed_resources DESC;' "
+        "content": "'original_query': 'Mostrar la evidencia al máximo de con ejecución financiera. para el plan con id: 6031.', 'sql_query': 'SELECT TOP 1 e.*, un.code AS unit_node_code, un.responsible AS unit_node_responsible FROM Evidences e INNER JOIN Unit_node un ON e.id_plan = un.id_plan WHERE e.executed_resources > 0 AND e.amount > 0 AND e.id_plan = 6031 ORDER BY e.executed_resources DESC;' "
     }, {
         "role": "user", 
         "content": "Seleccionar la localidad al mínimo de con ejecución física para el plan con id: 6031."
@@ -63,6 +63,42 @@ const chatExamples = [
     }, {
         "role": "assistant", 
         "content": "'original_query': 'Obtener las metas, y a donde pertenecen estas, de la secretaría de educación donde sea responsable. para el plan 6031', 'sql_query': 'SELECT nod.name, nod.id_node, nod.parent FROM ( SELECT un.responsible, un.id_node, nod.name, nod.parent FROM dbo.Nodes as nod JOIN dbo.Unit_node as un ON un.id_node = nod.id_node WHERE un.responsible = 'Secretaría de Educación' AND un.id_plan = 6031 ) AS res JOIN dbo.Nodes AS nod ON res.id_node LIKE nod.id_node+'.%' GROUP BY nod.name, nod.id_node, nod.parent UNION SELECT nod.name, un.id_node, nod.parent FROM dbo.Nodes AS nod JOIN dbo.Unit_node AS un ON un.id_node = nod.id_node WHERE un.responsible = 'Secretaría de Educación' AND un.id_plan = 6031 ORDER BY id_node'"
+    }, {
+        "role": "user",
+        "content": "Secretaría con menor ejecución financiera mayor a cero"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Secretaría con menor ejecución financiera mayor a cero' , 'sql_query': ' SELECT TOP 1 s.name AS SecretaryName, un.responsible AS ResponsibleName, SUM(UNY.financial_execution) AS TotalFinancialExecution FROM Unit_node un INNER JOIN Unit_node_year UNY ON un.code = UNY.code INNER JOIN Secretaries s ON s.name = un.responsible WHERE UNY.financial_execution > 0 AND un.id_plan = 6031 GROUP BY s.name, un.responsible ORDER BY TotalFinancialExecution ASC; '"
+    }, {
+        "role": "user",
+        "content": "Seleccionar las 5 primeras ejecuciones ordenadas de mayor a menor en el 2024"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar las 5 primeras ejecuciones ordenadas de mayor a menor en el 2024' , 'sql_query': ' SELECT TOP 5 UN.code, UN.responsible, UNY.physical_execution, UNY.physical_programming FROM Unit_node UN JOIN Unit_node_year UNY ON UN.code = UNY.code WHERE UNY.year = '2024' AND UN.id_plan = 6031 AND UNY.physical_programming > 0 ORDER BY UNY.physical_execution DESC; '"
+    }, {
+        "role": "user",
+        "content": "Seleccionar las 10 primeras ejecuciones ordenadas de mayor a menor"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar las 10 primeras ejecuciones ordenadas de mayor a menor' , 'sql_query': ' SELECT TOP 10 (UNY.physical_execution/UNY.physical_programming) as Percent_executed, UNY.*, UN.code AS unit_node_code FROM Unit_node_year UNY JOIN Unit_node UN ON UN.code = UNY.code WHERE UN.id_plan = 6031 AND UNY.physical_programming > 0 ORDER BY Percent_executed DESC; '"
+    }, {
+        "role": "user",
+        "content": "Seleccionar las 10 primeras ejecuciones ordenadas de menor a mayor"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar las 10 primeras ejecuciones ordenadas de menor a mayor' , 'sql_query': ' SELECT TOP 10 (UNY.physical_execution/UNY.physical_programming) as Percent_executed, UNY.* FROM Unit_node_year UNY JOIN Unit_node UN ON UN.code = UNY.code WHERE UN.id_plan = 6031 AND uny.physical_programming > 0 AND uny.physical_execution > 0 ORDER BY Percent_executed ASC; '"
+    }, {
+        "role": "user",
+        "content": "Seleccionar las 10 primeras ejecuciones financieras ordenadas de mayor a menor en el 2025"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar las 10 primeras ejecuciones financieras ordenadas de mayor a menor en el 2025' , 'sql_query': ' SELECT TOP 10 UN.code, UN.responsible, UNY.financial_execution FROM Unit_node UN JOIN Unit_node_year UNY ON UN.code = UNY.code WHERE UNY.year = '2025' AND UN.id_plan = 6031 AND UNY.financial_execution > 0 ORDER BY UNY.financial_execution DESC; '"
+    }, {
+        "role": "user",
+        "content": "Seleccionar todas las ejecuciones no por año de la secretaría de las TIC"
+    }, {
+        "role": "assistant",
+        "content": "'original_query': 'Seleccionar todas las ejecuciones no por año de la secretaría de las TIC' , 'sql_query': ' select * from Unit_node un where un.responsible = 'secretaría de las TIC' and un.id_plan = 6031 '"
     }
 ]
 
@@ -251,7 +287,7 @@ async function BuildResponse(data, msg) {
     const human_res = `
         Dada la pregunta de un usuario y la respuesta de las filas SQL de la base de datos de la que el usuario desea obtener la respuesta,
         escriba una respuesta en un objeto JSON con 2 propiedades: HTML y OPTIONS.
-        En la propiedad HTML se da respuesta a la pregunta del usuario utilizando etiquetas de contenido HTML. Si la respuesta incluye gráficos, se añade una etiqueta div con el id='chart-replace', sino no.
+        En la propiedad HTML se da respuesta a la pregunta del usuario utilizando etiquetas de contenido HTML. Si la respuesta incluye gráficos, se añade una etiqueta div con el id='chart-replace' ademas de la descripción del gráfico, sino no.
         En la propiedad OPTIONS si la respuesta incluye gráficos, se escribe JSON las opciones de configuración del gráfico para HighchartsReact. De lo contrario el valor es 'NULL'.
         Recuerda que para las veces que se pida un grafico de porcentajes, usa los valores de los porcentajes.
         <user_question>{{

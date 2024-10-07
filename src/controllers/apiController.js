@@ -86,7 +86,7 @@ export async function GetMessage(req, res) {
 }
  
 export async function DoQuestionToQuery(req, res) {
-    const { messages } = req.query;
+    const { messages } = req.body;
     if (!Array.isArray(messages) && messages.length === 0 ) return res.status(400).send('El arreglo de mensajes no puede estar vacio')
     try {
         let msgs = messages.map((m, i) => ({"role": i%2 == 0 ? "user" : "assistant", "content": m}));
@@ -101,7 +101,7 @@ export async function DoQuestionToQuery(req, res) {
 }
 
 export async function DoRowsToResponse(req, res) {
-    const { data, message } = req.query;
+    const { data, message } = req.body;
     try {
         const response = await openaiService.BuildResponse(data, message);
         return res.status(200).send(response);
