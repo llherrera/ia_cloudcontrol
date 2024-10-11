@@ -285,9 +285,10 @@ async function DoQuestionToQuery(messages) {
 
 async function BuildResponse(data, msg) {
     const human_res = `
-        Dada la pregunta de un usuario y la respuesta de las filas SQL de la base de datos de la que el usuario desea obtener la respuesta,
-        escriba una respuesta en un objeto JSON con 2 propiedades: HTML y OPTIONS.
-        En la propiedad HTML se da respuesta a la pregunta del usuario utilizando etiquetas de contenido HTML. Si la respuesta incluye gráficos, se añade una etiqueta div con el id='chart-replace' ademas de la descripción del gráfico, sino no.
+        Dada la pregunta de un usuario y la respuesta de las filas SQL de la base de datos de la que el usuario desea obtener la respuesta.
+        En todos los casos, omitir mostrar el dato del ID del plan.
+        Escriba una respuesta en un objeto JSON con 2 propiedades: HTML y OPTIONS.
+        En la propiedad HTML se da respuesta a la pregunta del usuario utilizando etiquetas de contenido HTML, procura dar respuestas amplias y usando la información de las tablas. Si la respuesta incluye gráficos, se añade una etiqueta div con el id='chart-replace' ademas de la descripción del gráfico, sino no.
         En la propiedad OPTIONS si la respuesta incluye gráficos, se escribe JSON las opciones de configuración del gráfico para HighchartsReact. De lo contrario el valor es 'NULL'.
         Recuerda que para las veces que se pida un grafico de porcentajes, usa los valores de los porcentajes.
         <user_question>{{
