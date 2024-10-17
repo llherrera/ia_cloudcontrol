@@ -110,3 +110,29 @@ export async function DoRowsToResponse(req, res) {
         return res.status(500).json(err.message);
     }
 }
+
+export async function AmperDoQuestionToQuery(req, res) {
+    const { messages } = req.body;
+    if (!Array.isArray(messages) && messages.length === 0 ) return res.status(400).send('El arreglo de mensajes no puede estar vacio')
+    try {
+        let msgs = messages.map((m, i) => ({"role": i%2 == 0 ? "user" : "assistant", "content": m}));
+        const response = await openaiService.DoQuestionToQuery(msgs);
+        if (!response.includes('Lo siento')) {
+            return res.status(200).send(response);
+        }
+        return res.status(400).send('Lo siento, ocurrió un problema, inténtalo más tarde.');
+    } catch (error) {
+        return res.status(500).send('Lo siento, ocurrió un problema, inténtalo más tarde.')
+    }
+}
+
+export async function AmperDoRowsToResponse(req, res) {
+    const { data, message } = req.body;
+    try {
+        const response = await openaiService.BuildResponse(data, message);
+        return res.status(200).send(response);
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json(err.message);
+    }
+}

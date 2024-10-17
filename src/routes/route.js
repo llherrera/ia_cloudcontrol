@@ -17,5 +17,7 @@ router
 .get("/get-message", apiController.GetMessage)
 .post("/do-query", apiController.DoQuestionToQuery)
 .post("/do-response", apiController.DoRowsToResponse)
+.post("/amper/do-query", apiController.DoQuestionToQuery)
+.post("/amper/do-response", apiController.DoRowsToResponse)
 
 export { router as ApiRouter };

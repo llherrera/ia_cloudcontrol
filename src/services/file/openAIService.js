@@ -386,8 +386,70 @@ async function BuildResponse(data, msg) {
     }
 }
 
+async function AmperDoQuestionToQuery(messages) {
+    const system_message = ``;
+    const system_info = ``;
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            response_format: {"type": "json_object"},
+            messages: [
+                {"role": "system", "content": system_message},
+                {"role": "system", "content": system_info},
+                ...chatExamples,
+                ...messages,
+            ],
+            temperature: 1,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stop: "END"
+        });
+        if (response.choices.length > 0)
+            return response.choices[0].message.content;
+
+        return "Lo siento, ocurrió un problema, inténtalo más tarde.";
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
+}
+
+async function AmperBuildResponse(data, msg) {
+    const human_res = `
+        <user_question>{{
+            ${msg}
+        }}</user_question>
+        <sql_response>{
+            data: {${data}}
+        }</sql_response>
+    `;
+    try {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {"role": "system", "content": human_res}
+            ],
+            temperature: 1,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stop: "END"
+        });
+        if (response.choices.length > 0)
+            return response.choices[0].message.content;
+
+        throw new Error("Lo siento, ocurrió un problema, inténtalo más tarde.");
+    } catch (error) {
+        console.log(e);
+        throw e;
+    }
+}
+
 export {
     GetMessage,
     DoQuestionToQuery,
-    BuildResponse
+    BuildResponse,
+    AmperDoQuestionToQuery,
+    AmperBuildResponse
 }
